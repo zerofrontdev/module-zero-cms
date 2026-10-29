@@ -1,9 +1,5 @@
 # Zero_Cms
 
-Zero for Magento Open Source: CMS pages and blocks built from typed components in a visual editor, with AI help; no page builder markup.
-
-More in the theme's `docs/cms.md` (https://zerofront.dev/docs).
-
 ## Install
 
 Requires Magento Open Source 2.4.7–2.4.9 and PHP 8.2–8.4 with the GD extension built with WebP (`php -r 'var_dump(function_exists("imagewebp"));'` says `true`; Magento's own PHP requirements cover the rest). Without WebP in GD, Zero skips its WebP image copies and serves the originals.
