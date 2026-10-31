@@ -11,6 +11,7 @@ namespace Zero\Cms\Controller\Adminhtml\Editor;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Zero\Cms\Model\Content\CacheRefresh;
 use Zero\Cms\Model\Content\Repository;
 use Zero\Cms\Model\Content\Validator;
 use Zero\Cms\Model\Content\Target\Pool;
@@ -27,8 +28,7 @@ class Save extends AbstractEditor implements HttpPostActionInterface
         Pool $targets,
         private readonly Repository $repository,
         private readonly Validator $validator,
-        private readonly \Magento\Framework\App\CacheInterface $cache,
-        private readonly \Magento\Framework\Event\ManagerInterface $eventManager
+        private readonly CacheRefresh $cacheRefresh
     ) {
         parent::__construct($context, $targets);
     }
@@ -52,12 +52,7 @@ class Save extends AbstractEditor implements HttpPostActionInterface
                 $this->adminName(),
                 (string) $this->getRequest()->getParam('note', '')
             );
-            // As core does on a CMS save: the page, block or post model itself,
-            // whose identities the page cache (built-in or Varnish) is tagged with.
-            if ($target['entity'] instanceof \Magento\Framework\DataObject\IdentityInterface) {
-                $this->eventManager->dispatch('clean_cache_by_tags', ['object' => $target['entity']]);
-                $this->cache->clean($target['entity']->getIdentities());
-            }
+            $this->cacheRefresh->refresh($target['entity']);
         } catch (LocalizedException $e) {
             return $this->json(['error' => $e->getMessage()], 400);
         }

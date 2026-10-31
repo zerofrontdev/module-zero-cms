@@ -11,19 +11,22 @@ namespace Zero\Cms\Controller\Adminhtml\Editor;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Zero\Cms\Model\Content\CacheRefresh;
 use Zero\Cms\Model\Content\Repository;
 use Zero\Cms\Model\Content\Target\Pool;
 
 /**
  * Removes a store view's own content: it shows the All Store Views content
- * again (for "All Store Views" itself: the page shows its HTML content).
+ * again (for "All Store Views" itself: the page shows its HTML content),
+ * and refreshes the page in the full page cache as Save does.
  */
 class Reset extends AbstractEditor implements HttpPostActionInterface
 {
     public function __construct(
         Context $context,
         Pool $targets,
-        private readonly Repository $repository
+        private readonly Repository $repository,
+        private readonly CacheRefresh $cacheRefresh
     ) {
         parent::__construct($context, $targets);
     }
@@ -36,6 +39,7 @@ class Reset extends AbstractEditor implements HttpPostActionInterface
         try {
             $target = $this->target();
             $this->repository->delete($target['type'], $target['id'], $target['store'], $this->adminName());
+            $this->cacheRefresh->refresh($target['entity']);
         } catch (LocalizedException $e) {
             return $this->json(['error' => $e->getMessage()], 400);
         }

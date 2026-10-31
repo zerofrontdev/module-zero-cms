@@ -36,11 +36,13 @@ class Index implements HttpGetActionInterface
      */
     public function execute()
     {
+        $draft = $this->request->getParam('draft', '');
+        $token = $this->request->getParam('token', '');
         $content = $this->drafts->load(
-            (string) $this->request->getParam('draft', ''),
+            is_scalar($draft) ? (string) $draft : '',
             (int) $this->storeManager->getStore()->getId(),
             (int) $this->request->getParam('expires', 0),
-            (string) $this->request->getParam('token', '')
+            is_scalar($token) ? (string) $token : ''
         );
         if ($content === null) {
             return $this->forwardFactory->create()->forward('noroute');

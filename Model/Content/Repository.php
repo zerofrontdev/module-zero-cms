@@ -102,7 +102,10 @@ class Repository
         return $clean;
     }
 
-    /** Removes a store view's own content (it then falls back to all store views). */
+    /**
+     * Removes a store view's own content (it then falls back to all store
+     * views). Storage only: the caller refreshes the cache (CacheRefresh).
+     */
     public function delete(string $type, int $entityId, int $storeId, string $user = ''): void
     {
         $previous = $this->getOwn($type, $entityId, $storeId);
